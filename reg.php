@@ -59,7 +59,7 @@ if(strlen($_POST["u_password"]) < PASSWORD_MIN_LENGTH)
         ALERT_TYPE_HISTORY_BACK);
 
 if($_POST["u_password"] != $_POST["u_password2"])
-    showAlert("A megadott jelszavak nem egyeznek!");
+    showAlert("A megadott jelszavak nem egyeznek!", ALERT_TYPE_HISTORY_BACK);
 
 
 
