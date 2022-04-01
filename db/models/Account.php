@@ -1,21 +1,18 @@
 <?php
 
-class Account {
-    public const REL_EQUALS     = 0;
-    public const REL_GREATER    = 1;
-    public const REL_LOWER      = 2;
-    public const REL_GREATEREQ  = 3;
-    public const REL_LOWEREQ    = 4;
-    public const REL_NOTEQUALS  = 5;
+class Account extends Model {
+    private int     $u_id;
+    private string  $u_username;
+    private string  $u_email;
+    private string  $u_password;
+    private int     $u_public;
+    private string  $u_born_date;
+    private string  $u_profile;
+    private string  $u_reg_date;
 
-    private $u_id;
-    private $u_username;
-    private $u_email;
-    private $u_password;
-    private $u_public;
-    private $u_born_date;
-    private $u_profile;
-    private $u_reg_date;
+    public function __construct() {
+        $this->class = get_class($this);
+    }
 
     /**
      * @return mixed
@@ -145,35 +142,35 @@ class Account {
         $this->u_reg_date = $u_reg_date;
     }
 
-    /**
-     * Returns true if the given user exists in the database, false if doesn't, null on oci_error
-     */
-    public static function existsWith($field, $value, $relation = Account::REL_EQUALS) {
+
+    public static function findAll($data = null): array|null {
         $db = new DBConnector();
 
-        $relation_signs = array(
-            Account::REL_EQUALS     => "=",
-            Account::REL_GREATER    => ">",
-            Account::REL_LOWER      => "<",
-            Account::REL_GREATEREQ  => ">=",
-            Account::REL_LOWEREQ    => "<=",
-            Account::REL_NOTEQUALS  => "!="
-        );
+        $sqlCmd = self::composeQuery($data);
+        $stid = oci_parse($db->getConn(), $sqlCmd);
+        oci_execute($stid);
 
-        $stid = oci_parse($db->getConn(), "SELECT U_ID FROM ACCOUNT WHERE :field :sign :value");
+        $retArr = array();
 
-        oci_bind_by_name($stid, ":field", $field);
-        oci_bind_by_name($stid, ":sign", $relation_signs[$relation]);
-        oci_bind_by_name($stid, ":value", $value);
+        while($rows = oci_fetch_assoc($stid)) {
+            $acc = new Account();
 
-        $res = oci_execute($stid);
+            $acc->setUId($rows["u_id"]);
+            $acc->setUUsername($rows["u_username"]);
+            $acc->setUPassword($rows["u_password"]);
+            $acc->setUPublic($rows["u_public"]);
+            $acc->setUEmail($rows["u_email"]);
+            $acc->setUBornDate($rows["u_born_date"]);
+            $acc->setUProfile($rows["u_profile"]);
+            $acc->setURegDate($rows["u_reg_date"]);
 
-        if(!$res)
-            return null;
-        return oci_num_rows($stid) > 0;
+            array_push($retArr, $acc);
+        }
+        return $retArr;
     }
 
-    public static function addNew($username, $email, $password, $public, $born_date, $profile) {
+
+    public static function addNew($data): bool {
         $db = new DBConnector();
 
         $queryStr = "INSERT INTO 
@@ -181,12 +178,12 @@ class Account {
                         VALUES(':username', ':email', ':password', ':public', ':born_date', ':profile')";
         $stid = oci_parse($db->getConn(), $queryStr);
 
-        oci_bind_by_name($stid, ":username", $username);
-        oci_bind_by_name($stid, ":email", $email);
-        oci_bind_by_name($stid, ":password", $password);
-        oci_bind_by_name($stid, ":public", $public);
-        oci_bind_by_name($stid, ":born_date", $born_date);
-        oci_bind_by_name($stid, ":profile", $profile);
+        oci_bind_by_name($stid, ":username", $data["u_username"]);
+        oci_bind_by_name($stid, ":email", $data["u_email"]);
+        oci_bind_by_name($stid, ":password", $data["u_password"]);
+        oci_bind_by_name($stid, ":public", $data["u_public"]);
+        oci_bind_by_name($stid, ":born_date", $data["u_born_date"]);
+        oci_bind_by_name($stid, ":profile", $data["u_profile"]);
 
         return oci_execute($stid);
     }
