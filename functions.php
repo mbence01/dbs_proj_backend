@@ -19,4 +19,10 @@ function showAlert($message, $path) {
          ";
 }
 
+function isUserLogged(): bool {
+    global $_SESSION;
+
+    return isset($_SESSION["logged"]) and $_SESSION["logged"];
+}
+
 ?>
