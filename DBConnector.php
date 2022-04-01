@@ -8,12 +8,13 @@ class DBConnector {
     public function __construct($fname = null) {
         $env = null;
 
-        if($env == null)
+        if($fname == null)
             $env = new EnvReader();
         else
             $env = new EnvReader($fname);
 
         $this->conn = oci_connect($env->readValue("DB_USER"), $env->readValue("DB_PASS"), $env->readValue("DB_TNS"));
+        return $this;
     }
 
     public function __destruct() {
