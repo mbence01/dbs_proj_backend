@@ -9,7 +9,7 @@ const PASSWORD_MIN_LENGTH   = 6;
 const PROFILE_MAX_LENGTH    = 5000000;
 
 
-if(isset($_SESSION["logged"]) AND $_SESSION["logged"])
+if(isUserLogged())
     header("Location: index.php");
     // TODO: Change index path
 
@@ -68,11 +68,19 @@ if($_POST["u_password"] != $_POST["u_password2"])
  */
 require_once("db/models/Account.php");
 
-if(Account::existsWith("u_username", $_POST["u_username"]))
-    showAlert($msg, "A megadott felhasználónév már regisztrálva van!", ALERT_TYPE_HISTORY_BACK);
+$userArr  = array(
+                    "u_username" => array($_POST["u_username"], Account::REL_EQUALS)
+                 );
 
-if(Account::existsWith("u_email", $_POST["u_email"]))
-    showAlert($msg, "A megadott e-mail cím már regisztrálva van!", ALERT_TYPE_HISTORY_BACK);
+$emailArr  = array(
+                    "u_email" => array($_POST["u_email"], Account::REL_EQUALS)
+                  );
+
+if(Account::existsWith($userArr))
+    showAlert("A megadott felhasználónév már regisztrálva van!", ALERT_TYPE_HISTORY_BACK);
+
+if(Account::existsWith($emailArr))
+    showAlert("A megadott e-mail cím már regisztrálva van!", ALERT_TYPE_HISTORY_BACK);
 
 
 /**
@@ -96,17 +104,18 @@ if(isset($_FILES["u_profile"])) {
 } else {
     $file_content = addslashes(file_get_contents("blank_pfp.png")); // TODO: Change def. img. path
 }
-
-$result = Account::addNew(  $_POST["u_username"],
-                            $_POST["u_email"],
-                            $pass,
-                            isset($_POST["u_public"]) ? 1 : 0,
-                            $_POST["u_born_date"],
-                            $file_content
+$userInfo = array(
+    "u_username"    => $_POST["u_username"],
+    "u_email"       => $_POST["u_email"],
+    "u_password"    => $pass,
+    "u_public"      => isset($_POST["u_public"]) ? 1 : 0,
+    "u_born_date"   => $_POST["u_born_date"],
+    "u_profile"     => $file_content
 );
+$result = Account::addNew($userInfo);
 
 if(!$result)
-    showAlert("Ismeretlen hiba történt! Kérlek próbáld meg újra pár perc múlva!", ALERT_TYPE_HISTORY_BACK);
+    showAlert("Ismeretlen hiba történt! Próbáld meg újra pár perc múlva!", ALERT_TYPE_HISTORY_BACK);
 else
     showAlert("Sikeresen regisztráltál!", "login.html"); // TODO: Change path
 
