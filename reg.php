@@ -89,7 +89,7 @@ if(isset($_FILES["u_profile"])) {
         showAlert("A megadott fájlformátum nem támogatott!", ALERT_TYPE_HISTORY_BACK);
 
     if($_FILES["u_profile"]["size"] > PROFILE_MAX_LENGTH)
-        showAlert("A megadott fájl mérete túl nagy! (Max. 5 mb)", ALERT_TYPE_HISTORY_BACK);
+        showAlert("A megadott fájl mérete túl nagy! (Max. " . PROFILE_MAX_LENGTH/1000000 . " mb)", ALERT_TYPE_HISTORY_BACK);
 
     $file_content = addslashes(file_get_contents($_FILES["u_profile"]["tmp_name"]));
     unlink($_FILES["u_profile"]["tmp_name"]);
