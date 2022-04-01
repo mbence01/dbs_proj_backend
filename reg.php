@@ -104,6 +104,8 @@ if(isset($_FILES["u_profile"])) {
 } else {
     $file_content = addslashes(file_get_contents("blank_pfp.png")); // TODO: Change def. img. path
 }
+
+
 $userInfo = array(
     "u_username"    => $_POST["u_username"],
     "u_email"       => $_POST["u_email"],
@@ -112,7 +114,9 @@ $userInfo = array(
     "u_born_date"   => $_POST["u_born_date"],
     "u_profile"     => $file_content
 );
-$result = Account::addNew($userInfo);
+$newAcc = Account::fromArray($userInfo);
+
+$result = Account::addNew($newAcc);
 
 if(!$result)
     showAlert("Ismeretlen hiba történt! Próbáld meg újra pár perc múlva!", ALERT_TYPE_HISTORY_BACK);
