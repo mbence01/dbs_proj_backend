@@ -10,8 +10,22 @@ class Account extends Model {
     private string  $u_profile;
     private string  $u_reg_date;
 
-    public function __construct() {
-        $this->class = get_class($this);
+    /**
+     * Creates an Account entity with the array given.
+     * @param $arr Array which contains informations about the entity
+     * @return Account Account created with the given array
+     */
+    public static function fromArray($arr): Account {
+        $newAcc = new Account();
+
+        $newAcc->setUUsername($arr["u_username"]);
+        $newAcc->setUEmail($arr["u_email"]);
+        $newAcc->setUPassword($arr["u_password"]);
+        $newAcc->setUPublic($arr["u_public"]);
+        $newAcc->setUBornDate($arr["u_born_date"]);
+        $newAcc->setUProfile($arr["u_profile"]);
+
+        return $newAcc;
     }
 
     /**
@@ -142,13 +156,21 @@ class Account extends Model {
         $this->u_reg_date = $u_reg_date;
     }
 
-
+    /**
+     * Gets the records matching the given conditions or null if no records are found
+     * @param $data array An associative array with format: { "field_name" => { "value_name", RELATION } }
+     * ... or null if you want to list all records
+     * @return array|null List of Account entities or null if no records found
+     */
     public static function findAll($data = null): array|null {
         $db = new DBConnector();
 
         $sqlCmd = self::composeQuery($data);
         $stid = oci_parse($db->getConn(), $sqlCmd);
         oci_execute($stid);
+
+        if(oci_num_rows($stid) == 0)
+            return null;
 
         $retArr = array();
 
@@ -169,8 +191,12 @@ class Account extends Model {
         return $retArr;
     }
 
-
-    public static function addNew($data): bool {
+    /**
+     * Insert a new record to the database
+     * @param $entity object An Account object with all required information set
+     * @return bool True if insertion was successfull, otherwise returns false
+     */
+    public static function addNew(object $entity): bool {
         $db = new DBConnector();
 
         $queryStr = "INSERT INTO 
@@ -178,12 +204,12 @@ class Account extends Model {
                         VALUES(':username', ':email', ':password', ':public', ':born_date', ':profile')";
         $stid = oci_parse($db->getConn(), $queryStr);
 
-        oci_bind_by_name($stid, ":username", $data["u_username"]);
-        oci_bind_by_name($stid, ":email", $data["u_email"]);
-        oci_bind_by_name($stid, ":password", $data["u_password"]);
-        oci_bind_by_name($stid, ":public", $data["u_public"]);
-        oci_bind_by_name($stid, ":born_date", $data["u_born_date"]);
-        oci_bind_by_name($stid, ":profile", $data["u_profile"]);
+        oci_bind_by_name($stid, ":username", $entity->getUUsername());
+        oci_bind_by_name($stid, ":email", $entity->getUEmail());
+        oci_bind_by_name($stid, ":password", $entity->getUPassword());
+        oci_bind_by_name($stid, ":public", $entity->getUPublic());
+        oci_bind_by_name($stid, ":born_date", $entity->getUBornDate());
+        oci_bind_by_name($stid, ":profile", $entity->getUProfile());
 
         return oci_execute($stid);
     }

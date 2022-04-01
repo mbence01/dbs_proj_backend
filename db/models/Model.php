@@ -1,8 +1,6 @@
 <?php
 
 abstract class Model {
-    protected string $class;
-
     public const REL_EQUALS     = 0;
     public const REL_GREATER    = 1;
     public const REL_LOWER      = 2;
@@ -11,7 +9,7 @@ abstract class Model {
     public const REL_NOTEQUALS  = 5;
 
     abstract public static function findAll(array $data = null);
-    abstract public static function addNew(array $data);
+    abstract public static function addNew(object $entity);
 
     /**
      * Returns true if the given entity exists in the database, false if not, null on oci_error
