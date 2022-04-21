@@ -1,5 +1,7 @@
 <?php
 
+require_once("DBConnector.php"); // TODO: Change path
+
 abstract class Model {
     public const REL_EQUALS     = 0;
     public const REL_GREATER    = 1;

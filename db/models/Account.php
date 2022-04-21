@@ -1,5 +1,7 @@
 <?php
 
+require_once("Model.php");
+
 class Account extends Model {
     private int     $u_id;
     private string  $u_username;
@@ -158,11 +160,11 @@ class Account extends Model {
 
     /**
      * Gets the records matching the given conditions or null if no records are found
-     * @param $data array An associative array with format: { "field_name" => { "value_name", RELATION } }
+     * @param array|null $data array An associative array with format: { "field_name" => { "value_name", RELATION } }
      * ... or null if you want to list all records
      * @return array|null List of Account entities or null if no records found
      */
-    public static function findAll($data = null): array|null {
+    public static function findAll(array $data = null): array|null {
         $db = new DBConnector();
 
         $sqlCmd = self::composeQuery($data);
