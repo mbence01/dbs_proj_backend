@@ -1,6 +1,6 @@
 <?php
 
-require_once("EnvReader.php");
+require_once("EnvReader.php"); // TODO: Change path
 
 class DBConnector {
     private $conn = false;
