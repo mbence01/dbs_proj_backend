@@ -101,4 +101,21 @@ class UserLogin extends Model {
 
         return oci_execute($stid);
     }
+
+    public function update() {
+        $db = new DBConnector();
+
+        $queryStr = "UPDATE USERLOGIN SET " .
+            "U_ID = :u_id, UL_IPADDR = :ul_ipaddr, UL_AGENT = :ul_agent, UL_DATETIME = :ul_datetime " .
+            "WHERE UL_ID = :ul_id";
+        $stid = oci_parse($db->getConn(), $queryStr);
+
+        oci_bind_by_name($stid, ":u_id", $this->u_id);
+        oci_bind_by_name($stid, ":ul_ipaddr", $this->ul_ipaddr);
+        oci_bind_by_name($stid, ":ul_agent", $this->ul_agent);
+        oci_bind_by_name($stid, ":ul_datetime", $this->ul_datetime);
+        oci_bind_by_name($stid, ":ul_id", $this->ul_id);
+
+        return oci_execute($stid);
+    }
 }

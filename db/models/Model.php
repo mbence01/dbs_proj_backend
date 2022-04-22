@@ -10,8 +10,26 @@ abstract class Model {
     public const REL_LOWEREQ    = 4;
     public const REL_NOTEQUALS  = 5;
 
+    /**
+     * Gets the records matching the given conditions or null if no records are found
+     * @param array|null $data array An associative array with format: { "field_name" => { "value_name", RELATION } }
+     * ... or null if you want to list all records
+     * @return array|null List of Model entities or null if no records found
+     */
     abstract public static function findAll(array $data = null);
+
+    /**
+     * Insert a new record to the database
+     * @param $entity object A Model object with all the required information set
+     * @return bool True if insertion was successfull, otherwise returns false
+     */
     abstract public static function addNew(object $entity);
+
+    /**
+     * Updates this entity in the database by the data stored in object variables
+     * @return bool True if update was successfull, otherwise returns false
+     */
+    abstract public function update();
 
     /**
      * Returns true if the given entity exists in the database, false if not, null on oci_error

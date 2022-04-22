@@ -158,12 +158,6 @@ class Account extends Model {
         $this->u_reg_date = $u_reg_date;
     }
 
-    /**
-     * Gets the records matching the given conditions or null if no records are found
-     * @param array|null $data array An associative array with format: { "field_name" => { "value_name", RELATION } }
-     * ... or null if you want to list all records
-     * @return array|null List of Account entities or null if no records found
-     */
     public static function findAll(array $data = null): array|null {
         $db = new DBConnector();
 
@@ -190,11 +184,6 @@ class Account extends Model {
         return (count($retArr) == 0) ? null : $retArr;
     }
 
-    /**
-     * Insert a new record to the database
-     * @param $entity object An Account object with all required information set
-     * @return bool True if insertion was successfull, otherwise returns false
-     */
     public static function addNew(object $entity): bool {
         $db = new DBConnector();
 
@@ -216,6 +205,27 @@ class Account extends Model {
         oci_bind_by_name($stid, ":u_public", $u_public);
         oci_bind_by_name($stid, ":born_date", $u_born_date);
         oci_bind_by_name($stid, ":profile", $u_profile);
+
+        return oci_execute($stid);
+    }
+
+    public function update() {
+        $db = new DBConnector();
+
+        $queryStr = "UPDATE ACCOUNT SET " .
+            "U_USERNAME = :u_username, U_EMAIL = :u_email, U_PASSWORD = :u_password, " .
+            "U_PUBLIC = :u_public, U_BORN_DATE = :u_born_date, U_REG_DATE = :u_reg_date, U_PROFILE = :u_profile " .
+            "WHERE U_ID = :u_id";
+        $stid = oci_parse($db->getConn(), $queryStr);
+
+        oci_bind_by_name($stid, ":u_username", $this->u_username);
+        oci_bind_by_name($stid, ":u_email", $this->u_email);
+        oci_bind_by_name($stid, ":u_password", $this->u_password);
+        oci_bind_by_name($stid, ":u_public", $this->u_public);
+        oci_bind_by_name($stid, ":u_born_date", $this->u_born_date);
+        oci_bind_by_name($stid, ":u_reg_date", $this->u_reg_date);
+        oci_bind_by_name($stid, ":u_profile", $this->u_profile);
+        oci_bind_by_name($stid, ":u_id", $this->u_id);
 
         return oci_execute($stid);
     }

@@ -115,15 +115,15 @@ class Video extends Model {
         while($rows = oci_fetch_assoc($stid)) {
             $video = new Video();
 
-            $video->setVId($rows["v_id"]);
-            $video->setVTitle($rows["v_title"]);
-            $video->setVUploaderId($rows["v_uploader_id"]);
-            $video->setVUploadDate($rows["v_upload_date"]);
-            $video->setVDuration($rows["v_duration"]);
-            $video->setVDescription($rows["v_description"]);
-            $video->setVVisibility($rows["v_visibility"]);
-            $video->setVThumbnail($rows["v_thumbnail"]);
-            $video->setVFilename($rows["v_filename"]);
+            $video->setVId($rows["V_ID"]);
+            $video->setVTitle($rows["V_TITLE"]);
+            $video->setVUploaderId($rows["V_UPLOADER_ID"]);
+            $video->setVUploadDate($rows["V_UPLOAD_DATE"]);
+            $video->setVDuration($rows["V_DURATION"]);
+            $video->setVDescription($rows["V_DESCRIPTION"]);
+            $video->setVVisibility($rows["V_VISIBILITY"]);
+            $video->setVThumbnail($rows["V_THUMBNAIL"]);
+            $video->setVFilename($rows["V_FILENAME"]);
 
             array_push($retArr, $video);
         }
@@ -153,6 +153,29 @@ class Video extends Model {
         oci_bind_by_name($stid, ":visibility", $v_visibility);
         oci_bind_by_name($stid, ":filename", $v_filename);
         oci_bind_by_name($stid, ":thumbnail", $v_thumbnail);
+
+        return oci_execute($stid);
+    }
+
+    public function update() {
+        $db = new DBConnector();
+
+        $queryStr = "UPDATE VIDEO SET " .
+            "V_TITLE = :v_title, V_UPLOADER_ID = :v_uploader_id, V_UPLOAD_DATE = :v_upload_date, " .
+            "V_DURATION = :v_duration, V_VISIBILITY = :v_visibility, V_FILENAME = :v_filename, " .
+            "V_DESCRIPTION = :v_description, V_THUMBNAIL = :v_thumbnail " .
+            "WHERE V_ID = :v_id";
+        $stid = oci_parse($db->getConn(), $queryStr);
+
+        oci_bind_by_name($stid, ":v_title", $this->v_title);
+        oci_bind_by_name($stid, ":v_uploader_id", $this->v_uploader_id);
+        oci_bind_by_name($stid, ":v_upload_date", $this->v_upload_date);
+        oci_bind_by_name($stid, ":v_duration", $this->v_duration);
+        oci_bind_by_name($stid, ":v_visibility", $this->v_visibility);
+        oci_bind_by_name($stid, ":v_filename", $this->v_filename);
+        oci_bind_by_name($stid, ":v_description", $this->v_description);
+        oci_bind_by_name($stid, ":v_thumbnail", $this->v_thumbnail);
+        oci_bind_by_name($stid, ":v_id", $this->v_id);
 
         return oci_execute($stid);
     }
