@@ -7,16 +7,17 @@ parser = argparse.ArgumentParser()
 parser.version = '1.0'
 parser.add_argument('-create_thumbnail', action='store_true', default=False)
 parser.add_argument('-get_duration', action='store_true', default=False)
-parser.add_argument('-o', action='store', default=path.join('videostorage', 'tmp')) # TODO: Change path
+parser.add_argument('-o', action='store', default=path.join('videostorage', 'thumbnails')) # TODO: Change path
 parser.add_argument('-f', action='store', default=None)
 args = parser.parse_args()
 
 def main():
-    if args.f is None:
-        raise Exception('Filename required')
+    if args.f is None or not path.exists(args.f):
+        print('Invalid file')
+        return 0
 
     if args.create_thumbnail:
-        output = path.join(args.o, args.f + '.jpg')
+        output = path.join(args.o, path.basename(args.f) + '.jpg')
         subprocess.run('ffmpeg -i "' + args.f + '" -ss 10 -vframes 1 -s 1920x1080 -y "' + output + '"', stdout = subprocess.DEVNULL, stderr = subprocess.STDOUT)
         print(output)
 
