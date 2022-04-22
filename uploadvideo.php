@@ -4,9 +4,10 @@ session_start();
 require_once("functions.php"); // TODO: Change path
 require_once("db/models/Video.php"); // TODO: Change path
 
-const VIDEO_MAX_SIZE    = 500000000;
-const VIDEO_TARGET_DIR  = "videostorage/"; // TODO: Change target dir
-const ACCEPTABLE_TYPES  = array( "mp4", "avi", "mov", "mkv" );
+const VIDEO_MAX_SIZE            = 500000000;
+const VIDEO_TARGET_DIR          = "videostorage/"; // TODO: Change target dir
+const ACCEPTABLE_TYPES          = array( "mp4", "avi", "mov", "mkv" );
+const PYTHON_VERSION_ON_SERVER  = "python";
 
 if(!isUserLogged() or $_SERVER["REQUEST_METHOD"] != "POST")
     require_once("404.html"); // TODO: Change path
@@ -35,40 +36,42 @@ if(!move_uploaded_file($_FILES["video"]["tmp_name"], $targetLocation))
 
 
 
-$cmd = "python3 videodata.py -f \"" . $targetLocation . "\" ";
+$cmd = PYTHON_VERSION_ON_SERVER . " videodata.py -f \"" . $targetLocation . "\" ";
 $cmdOutput = "";
 
-$thumbnailObj = null;
+$thumbnailSrc = "thumbnail.png"; // TODO: Change path
 $videoDuration = 0;
 
 // creating a thumbnail for video
 exec($cmd . "-create_thumbnail", $cmdOutput);
-echo $cmd;
+
+if($cmdOutput == "Invalid file")
+    return print "Hiba történt az indexkép létrehozása közben!\nPróbáld újra később!";
+
 $cmdOutput = trim($cmdOutput[0]);
 
 if(file_exists($cmdOutput))
-    $thumbnailObj = file_get_contents($cmdOutput);
-else
-    $thumbnailObj = file_get_contents("thumbnail.png"); // TODO: Change thumbnail path
-unlink($cmdOutput);
+    $thumbnailSrc = $cmdOutput;
+
 
 // getting video duration
 exec($cmd . "-get_duration", $cmdOutput);
-echo "DURATION: " . var_dump($cmdOutput);
+
+if($cmdOutput == "Invalid file")
+    return print "Hiba történt a metaadatok lekérése közben!\nPróbáld újra később!";
+
 $cmdOutput = trim($cmdOutput[0]);
 
 
-//$userObj = unserialize($_SESSION["userData"]);
+$userObj = unserialize($_SESSION["userData"]);
 
 $newVideo = new Video();
 $newVideo->setVTitle($_POST["v_title"]);
-//$newVideo->setVUploaderId($userObj->getUId());
-$newVideo->setVUploaderId(1);
+$newVideo->setVUploaderId($userObj->getUId());
 $newVideo->setVDuration($videoDuration);
 $newVideo->setVDescription(empty($_POST["v_description"]) ? null : $_POST["v_description"]);
-//$newVideo->setVVisibility($_POST["v_visibility"]);
-$newVideo->setVVisibility(0);
-$newVideo->setVThumbnail($thumbnailObj);
+$newVideo->setVVisibility($_POST["v_visibility"]);
+$newVideo->setVThumbnail($thumbnailSrc);
 $newVideo->setVFilename($targetFilename);
 
 $result = Video::addNew($newVideo);
