@@ -26,7 +26,7 @@ abstract class Model {
 
         if(!$res)
             return null;
-        return oci_num_rows($stid) > 0;
+        return oci_fetch($stid);
     }
 
     /**

@@ -67,9 +67,6 @@ class UserLogin extends Model {
         $stid = oci_parse($db->getConn(), $sqlCmd);
         oci_execute($stid);
 
-        if(oci_num_rows($stid) == 0)
-            return null;
-
         $retArr = array();
 
         while($rows = oci_fetch_assoc($stid)) {
@@ -83,7 +80,7 @@ class UserLogin extends Model {
 
             array_push($retArr, $login);
         }
-        return $retArr;
+        return (count($retArr) == 0) ? null : $retArr;
     }
 
     public static function addNew(object $entity): bool {
@@ -91,12 +88,16 @@ class UserLogin extends Model {
 
         $queryStr = "INSERT INTO 
                         USERLOGIN(U_ID, UL_IPADDR, UL_AGENT)
-                        VALUES(':u_id', 'ul_ipaddr', 'ul_agent')";
+                        VALUES(:u_id, :ul_ipaddr, :ul_agent)";
         $stid = oci_parse($db->getConn(), $queryStr);
 
-        oci_bind_by_name($stid, ":u_id", $entity->getUId());
-        oci_bind_by_name($stid, ":ul_ipaddr", $entity->getUlIpAddr());
-        oci_bind_by_name($stid, ":ul_agent", $entity->getUlAgent());
+        $u_id       = $entity->getUId();
+        $ul_ipaddr  = $entity->getUlIpAddr();
+        $ul_agent   = $entity->getUlAgent();
+
+        oci_bind_by_name($stid, ":u_id", $u_id);
+        oci_bind_by_name($stid, ":ul_ipaddr", $ul_ipaddr);
+        oci_bind_by_name($stid, ":ul_agent", $ul_agent);
 
         return oci_execute($stid);
     }

@@ -171,26 +171,23 @@ class Account extends Model {
         $stid = oci_parse($db->getConn(), $sqlCmd);
         oci_execute($stid);
 
-        if(oci_num_rows($stid) == 0)
-            return null;
-
         $retArr = array();
 
         while($rows = oci_fetch_assoc($stid)) {
             $acc = new Account();
 
-            $acc->setUId($rows["u_id"]);
-            $acc->setUUsername($rows["u_username"]);
-            $acc->setUPassword($rows["u_password"]);
-            $acc->setUPublic($rows["u_public"]);
-            $acc->setUEmail($rows["u_email"]);
-            $acc->setUBornDate($rows["u_born_date"]);
-            $acc->setUProfile($rows["u_profile"]);
-            $acc->setURegDate($rows["u_reg_date"]);
+            $acc->setUId($rows["U_ID"]);
+            $acc->setUUsername($rows["U_USERNAME"]);
+            $acc->setUPassword($rows["U_PASSWORD"]);
+            $acc->setUPublic($rows["U_PUBLIC"]);
+            $acc->setUEmail($rows["U_EMAIL"]);
+            $acc->setUBornDate($rows["U_BORN_DATE"]);
+            $acc->setUProfile($rows["U_PROFILE"]);
+            $acc->setURegDate($rows["U_REG_DATE"]);
 
             array_push($retArr, $acc);
         }
-        return $retArr;
+        return (count($retArr) == 0) ? null : $retArr;
     }
 
     /**
@@ -202,16 +199,23 @@ class Account extends Model {
         $db = new DBConnector();
 
         $queryStr = "INSERT INTO 
-                        ACCOUNT(U_USERNAME, U_EMAIL, U_PASSWORD, U_PUBLIC, U_BORN_DATE, U_PROFILE, U_REG_DATE)
-                        VALUES(':username', ':email', ':password', ':public', ':born_date', ':profile')";
+                        ACCOUNT(U_USERNAME, U_EMAIL, U_PASSWORD, U_PUBLIC, U_BORN_DATE, U_PROFILE)
+                        VALUES(:username, :email, :password, :u_public, TO_DATE(:born_date, 'YYYY-MM-DD'), :profile)";
         $stid = oci_parse($db->getConn(), $queryStr);
 
-        oci_bind_by_name($stid, ":username", $entity->getUUsername());
-        oci_bind_by_name($stid, ":email", $entity->getUEmail());
-        oci_bind_by_name($stid, ":password", $entity->getUPassword());
-        oci_bind_by_name($stid, ":public", $entity->getUPublic());
-        oci_bind_by_name($stid, ":born_date", $entity->getUBornDate());
-        oci_bind_by_name($stid, ":profile", $entity->getUProfile());
+        $u_username     = $entity->getUUsername();
+        $u_email        = $entity->getUEmail();
+        $u_password     = $entity->getUPassword();
+        $u_public       = $entity->getUPublic();
+        $u_born_date    = $entity->getUBornDate();
+        $u_profile      = $entity->getUProfile();
+
+        oci_bind_by_name($stid, ":username", $u_username);
+        oci_bind_by_name($stid, ":email", $u_email);
+        oci_bind_by_name($stid, ":password", $u_password);
+        oci_bind_by_name($stid, ":u_public", $u_public);
+        oci_bind_by_name($stid, ":born_date", $u_born_date);
+        oci_bind_by_name($stid, ":profile", $u_profile);
 
         return oci_execute($stid);
     }

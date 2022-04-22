@@ -110,9 +110,6 @@ class Video extends Model {
         $stid = oci_parse($db->getConn(), $sqlCmd);
         oci_execute($stid);
 
-        if(oci_num_rows($stid) == 0)
-            return null;
-
         $retArr = array();
 
         while($rows = oci_fetch_assoc($stid)) {
@@ -130,24 +127,32 @@ class Video extends Model {
 
             array_push($retArr, $video);
         }
-        return $retArr;
+        return (count($retArr) == 0) ? null : $retArr;
     }
 
     public static function addNew(object $entity): bool {
         $db = new DBConnector();
 
         $queryStr = "INSERT INTO 
-                        VIDEO(V_TITLE, V_UPLOADER_ID, V_DURATION, V_DESCRIPTION, V_VISIBILITY, V_THUMBNAIL, V_FILENAME)
-                        VALUES(':v_title', ':uploader_id', ':duration', ':description', ':visibility', ':thumbnail', ':filename')";
+                        VIDEO(V_TITLE, V_UPLOADER_ID, V_DURATION, V_DESCRIPTION, V_VISIBILITY, V_FILENAME, V_THUMBNAIL)
+                        VALUES(:v_title, :uploader_id, :duration, :description, :visibility, :filename, :thumbnail)";
         $stid = oci_parse($db->getConn(), $queryStr);
 
-        oci_bind_by_name($stid, ":v_title", $entity->getVTitle());
-        oci_bind_by_name($stid, ":uploader_id", $entity->getVUploaderId());
-        oci_bind_by_name($stid, ":duration", $entity->getVDuration());
-        oci_bind_by_name($stid, ":description", $entity->getVDescription());
-        oci_bind_by_name($stid, ":visibility", $entity->getVVisibility());
-        oci_bind_by_name($stid, ":thumbnail", $entity->getVThumbnail());
-        oci_bind_by_name($stid, ":filename", $entity->getVFilename());
+        $v_title        = $entity->getVTitle();
+        $v_uploader_id  = $entity->getVUploaderId();
+        $v_duration     = $entity->getVDuration();
+        $v_description  = $entity->getVDescription();
+        $v_visibility   = $entity->getVVisibility();
+        $v_filename     = $entity->getVFilename();
+        $v_thumbnail    = $entity->getVThumbnail();
+
+        oci_bind_by_name($stid, ":v_title", $v_title);
+        oci_bind_by_name($stid, ":uploader_id", $v_uploader_id);
+        oci_bind_by_name($stid, ":duration", $v_duration);
+        oci_bind_by_name($stid, ":description", $v_description);
+        oci_bind_by_name($stid, ":visibility", $v_visibility);
+        oci_bind_by_name($stid, ":filename", $v_filename);
+        oci_bind_by_name($stid, ":thumbnail", $v_thumbnail);
 
         return oci_execute($stid);
     }
@@ -158,7 +163,7 @@ class Video extends Model {
      * @return string Unique identification string
      */
     public static function generateUniqueId(): string {
-        static $MAX_SIZE = 32;
+        static $MAX_SIZE = 16;
         static $abc = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";
 
         while(true) {
