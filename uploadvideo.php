@@ -3,6 +3,7 @@
 session_start();
 require_once("functions.php"); // TODO: Change path
 require_once("db/models/Video.php"); // TODO: Change path
+require_once("db/models/Account.php"); // TODO: Change path
 
 const VIDEO_MAX_SIZE            = 500000000;
 const VIDEO_TARGET_DIR          = "videostorage/"; // TODO: Change target dir
@@ -72,7 +73,7 @@ $newVideo->setVDuration($videoDuration);
 $newVideo->setVDescription(empty($_POST["v_description"]) ? null : $_POST["v_description"]);
 $newVideo->setVVisibility($_POST["v_visibility"]);
 $newVideo->setVThumbnail($thumbnailSrc);
-$newVideo->setVFilename($targetFilename);
+$newVideo->setVFilename($targetFilename . "." . $videoExtension);
 
 $result = Video::addNew($newVideo);
 
