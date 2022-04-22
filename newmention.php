@@ -12,11 +12,12 @@ if(!isUserLogged() or $_SERVER["REQUEST_METHOD"] != "POST")
 if(!isset($_POST["m_text"]) or strlen($_POST["m_text"]) < 1 or strlen($_POST["m_text"]) > TEXT_MAX_LENGTH)
     return showAlert("A komment hosszának 0 és " . TEXT_MAX_LENGTH . " közé kell esnie!", ALERT_TYPE_HISTORY_BACK);
 
-if(!isset($_POST["v_id"]) or !isset($_POST["u_id"]) or !isset($_POST["m_parent"]))
-    return showAlert("A megjegyzésküldő form módosítva lett, próbáld újra!");
+if(!isset($_POST["v_id"]) or !isset($_POST["m_parent"]))
+    return showAlert("A megjegyzésküldő form módosítva lett, próbáld újra!", ALERT_TYPE_HISTORY_BACK);
 
 
-require_once("db/models/Video.php");
+require_once("db/models/Account.php"); // TODO: Change path
+require_once("db/models/Video.php"); // TODO: Change path
 
 $parentMentionInfo = array( "m_id" => array( $_POST["m_parent"], Model::REL_EQUALS ) );
 $mentionVideoInfo = array( "v_id" => array( $_POST["v_id"], Model::REL_EQUALS ) );
@@ -34,7 +35,7 @@ $newMention = new Mention();
 $newMention->setVId($_POST["v_id"]);
 $newMention->setUId($user->getUId());
 $newMention->setMText($_POST["m_text"]);
-$newMention->setMParent($_POST["m_parent"]);
+$newMention->setMParent(($_POST["m_parent"] == 0) ? null : $_POST["m_parent"]);
 
 $result = Mention::addNew($newMention);
 
