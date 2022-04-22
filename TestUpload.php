@@ -58,6 +58,7 @@ if($_SERVER["REQUEST_METHOD"] == "POST") {
                 var form = new FormData();
                 form.append("video", fileInput.files[0]);
                 form.append("v_title", document.getElementById("v_title").value);
+                form.append("v_visibility", document.getElementById("v_visibility").value);
 
                 xhttp.send(form);
             }
@@ -77,7 +78,7 @@ if($_SERVER["REQUEST_METHOD"] == "POST") {
 
                 ?>
             </select><br>
-            <input type="number" name="v_visibility"><br>
+            <input type="number" name="v_visibility" id="v_visibility"><br>
             <input type="file" name="video" id="fileInput"><br>
             <input type="submit" name="submit" value="Upload">
         </form>
