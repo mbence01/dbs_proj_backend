@@ -9,7 +9,7 @@ if(isUserLogged())
 
 
 if($_SERVER["REQUEST_METHOD"] != "POST")
-    require_once("404.html"); // TODO: Change path
+    return require_once("404.html"); // TODO: Change path
 
 
 $required_fields = array(
@@ -39,12 +39,13 @@ if(!Account::existsWith($loginCreds))
 
 $userObj = Account::findAll($loginCreds)[0];
 $_SESSION["userData"] = serialize($userObj);
+$_SESSION["logged"] = true;
 
 // Save log of user login
 $userLogin = new UserLogin();
 $userLogin->setUId($userObj->getUId());
-$userLogin->setUlIpaddr($_POST["REMOTE_ADDR"]);
-$userLogin->setUlAgent($_POST["HTTP_USER_AGENT"]);
+$userLogin->setUlIpaddr($_SERVER["REMOTE_ADDR"]);
+$userLogin->setUlAgent($_SERVER["HTTP_USER_AGENT"]);
 UserLogin::addNew($userLogin);
 
 showAlert("Sikeres bejelentkezés!", "index.php");
