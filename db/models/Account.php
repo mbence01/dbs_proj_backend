@@ -13,7 +13,7 @@ class Account extends Model {
     private string  $u_reg_date;
 
     /**
-     * Creates an Account entity with the array given.
+     * Creates an Account entity based on the array given.
      * @param $arr Array which contains informations about the entity
      * @return Account Account created with the given array
      */
