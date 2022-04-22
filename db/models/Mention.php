@@ -1,7 +1,8 @@
 <?php
 
-class Mention
-{
+require_once("Model.php");
+
+class Mention extends Model {
     private $m_id;
     private $v_id;
     private $u_id;
@@ -92,4 +93,50 @@ class Mention
     }
 
 
+    public static function findAll(array $data = null): array|null {
+        $db = new DBConnector();
+
+        $sqlCmd = self::composeQuery($data);
+        $stid = oci_parse($db->getConn(), $sqlCmd);
+        oci_execute($stid);
+
+        $retArr = array();
+
+        while($rows = oci_fetch_assoc($stid)) {
+            $mention = new Mention();
+
+            $mention->setMId($rows["m_id"]);
+            $mention->setVId($rows["v_id"]);
+            $mention->setUId($rows["u_id"]);
+            $mention->setMText($rows["m_text"]);
+            $mention->setMLike($rows["m_like"]);
+            $mention->setMDislike($rows["m_dislike"]);
+            $mention->setMParent($rows["m_parent"]);
+            $mention->setMPinned($rows["m_pinned"]);
+
+            array_push($retArr, $mention);
+        }
+        return (count($retArr) == 0) ? null : $retArr;
+    }
+
+    public static function addNew(object $entity): bool {
+        $db = new DBConnector();
+
+        $queryStr = "INSERT INTO 
+                        MENTION(V_ID, U_ID, M_TEXT, M_PARENT)
+                        VALUES(:v_id, :u_id, :m_text, :m_parent)";
+        $stid = oci_parse($db->getConn(), $queryStr);
+
+        $v_id       = $entity->getVId();
+        $u_id       = $entity->getUId();
+        $m_text     = $entity->getMText();
+        $m_parent   = $entity->getMParent();
+
+        oci_bind_by_name($stid, ":v_id", $v_id);
+        oci_bind_by_name($stid, ":u_id", $u_id);
+        oci_bind_by_name($stid, ":m_text", $m_text);
+        oci_bind_by_name($stid, ":m_parent", $m_parent);
+
+        return oci_execute($stid);
+    }
 }
