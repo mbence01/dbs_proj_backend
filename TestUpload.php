@@ -65,8 +65,20 @@ if($_SERVER["REQUEST_METHOD"] == "POST") {
     </head>
     <body>
         <form onsubmit="formSubmitted(event);" method="post" enctype="multipart/form-data">
-            <input type="text" id="v_title" name="v_title">
-            <input type="file" name="video" id="fileInput">
+            Title: <input type="text" id="v_title" name="v_title"><br>
+            Uploader: <select name="v_uploader_id">
+                <?php
+
+                require_once("db/models/Account.php");
+
+                foreach(Account::findAll() as $user) {
+                    echo "<option value='" . $user->getUId() . "'>" . $user->getUUsername() . "</option>";
+                }
+
+                ?>
+            </select><br>
+            <input type="number" name="v_visibility"><br>
+            <input type="file" name="video" id="fileInput"><br>
             <input type="submit" name="submit" value="Upload">
         </form>
         <progress id="progress" min="0" value="0" max="100"> 0% </progress>
